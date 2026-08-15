@@ -1,149 +1,175 @@
-// 1. if Expressions
-// if expression aapko conditional branches chalane ki permission deta hai.
+/*
+# 1. if Expressions
 
-// fn main() {
-//     let number=3;
-//     if number<5{
-//         println!("number is lesser");
-//     }
-// }
+`if` expression aapko conditional branches chalane ki permission deta hai:
 
-// ⚠️ Strict Rule: Condition MUST be a bool
+```rust
+fn main() {
+    let number = 3;
+    if number < 5 {
+        println!("number is lesser");
+    }
+}
+```
 
-// C, C++, JavaScript ya Python mein if (number) likhna valid hota hai (jahan 0 false hota hai aur non-zero true). Lekin Rust mein yeh strict ERROR hai!
+## ⚠️ Strict Rule: Condition MUST be a bool
 
-// Rust kabhi bhi numbers ya strings ko auto-convert karke bool (truthy/falsy) nahi banata. Condition ka result exact bool (true ya false) hona chahiye
+C, C++, JavaScript ya Python mein `if (number)` likhna valid hota hai (jahan 0 false hota hai aur non-zero true). Lekin Rust mein yeh strict **ERROR** hai!
 
-// fn main() {
-//     let number = 3;
+Rust kabhi bhi numbers ya strings ko auto-convert karke bool (truthy/falsy) nahi banata. Condition ka result exact `bool` (true ya false) hona chahiye:
 
-//     // ❌ COMPILE ERROR! `number` integer hai, bool nahi!
-//     /*
-//     if number {
-//         println!("Number was three");
-//     }
-//     */
-//     // ✅ SAHI TAREEKA: Exact boolean comparison (`number != 0`)
-//     if number != 0 {
-//         println!("Number is not zero");
-//     }
-// }
+```rust
+fn main() {
+    let number = 3;
 
-// Multiple Conditions: else if
-// Jab 2 se zyada conditions check karni hon:
+    // ❌ COMPILE ERROR! `number` integer hai, bool nahi!
+    // if number {
+    //     println!("Number was three");
+    // }
 
-// fn main() {
-//     let number = 4;
-//     if number % 2 == 0 {
-//         println!("number devisiable by 2");
-//     } else if number % 6 == 0 {
-//         println!("number devisiable by 6")
-//     } else {
-//         println!("number is not devisiable by 3 and 4")
-//     }
-// }
+    // ✅ SAHI TAREEKA: Exact boolean comparison (`number != 0`)
+    if number != 0 {
+        println!("Number is not zero");
+    }
+}
+```
 
-// Using if in a let Statement
+## Multiple Conditions: else if
 
-// Rust mein if ek expression hai (value return karta hai). Iska matlab aap ise let statement ke right side par use kar sakte ho (jaise baaki languages mein ternary operator ? : hota hai):
+Jab 2 se zyada conditions check karni hon:
 
-// fn main(){
-//     let condition=true;
-//     let number=if condition {5} else {6};
-//     println!("the value of number is:{number}");
-// }
+```rust
+fn main() {
+    let number = 4;
+    if number % 2 == 0 {
+        println!("number devisiable by 2");
+    } else if number % 6 == 0 {
+        println!("number devisiable by 6")
+    } else {
+        println!("number is not devisiable by 3 and 4")
+    }
+}
+```
 
-// 2. Repetition with Loops
+## Using if in a let Statement
 
-// A. loop (Infinite Loop)
-// loop keyword code ko tab tak chalta rehta hai jab tak aap explicitly break na kar dein.
+Rust mein `if` ek expression hai (value return karta hai). Iska matlab aap ise `let` statement ke right side par use kar sakte ho (jaise baaki languages mein ternary operator `?:` hota hai):
 
-// fn main() {
-//     let mut counter = 0;
-//     loop {
-//         counter += 1;
-//         println!("counter:{counter}");
-//         if counter == 3 {
-//             break;
-//         }
-//     }
-// }
+```rust
+fn main() {
+    let condition = true;
+    let number = if condition { 5 } else { 6 };
+    println!("the value of number is: {number}");
+}
+```
 
-// Returning Values from loop
+# 2. Repetition with Loops
 
-// Aap loop ko koi value calculate karne ke liye use kar sakte ho aur break ke aage value likhkar us value ko return karva sakte ho:
+## A. loop (Infinite Loop)
 
-// fn main() {
-//     let mut counter = 0;
-//     let result = loop {
-//         counter += 1;
-//         if counter == 10 {
-//            break counter * 2;
+`loop` keyword code ko tab tak chalta rehta hai jab tak aap explicitly `break` na kar dein:
 
-//         }
-//     };
-//     println!("the result is: {result}");
-// }
+```rust
+fn main() {
+    let mut counter = 0;
+    loop {
+        counter += 1;
+        println!("counter: {counter}");
+        if counter == 3 {
+            break;
+        }
+    }
+}
+```
 
-// Loop Labels (Nested Loops mein kisi specific loop ko break karna)
+## Returning Values from loop
 
-// Jab ek loop ke andar doosra loop hota hai, toh aap 'label lagakar specify kar sakte hain ki kaunsa loop break karna hai:
+Aap loop ko koi value calculate karne ke liye use kar sakte ho aur `break` ke aage value likhkar us value ko return karva sakte ho:
 
-// fn main() {
-//     let mut count = 0;
+```rust
+fn main() {
+    let mut counter = 0;
+    let result = loop {
+        counter += 1;
+        if counter == 10 {
+            break counter * 2;
+        }
+    };
+    println!("the result is: {result}");
+}
+```
 
-//     'counting_up: loop {
-//         println!("count ={count}");
-//         let mut remaining = 10;
-//         loop {
-//             println!("remaining={remaining}");
-//             if remaining == 9 {
-//                 break;
-//             }
-//             if count == 2 {
-//                 break 'counting_up;
-//             }
-//             remaining -= 1;
-//         }
-//         count += 1;
-//     }
-// }
+## Loop Labels (Nested Loops)
 
-// B. while Loop (Conditional Loop
-// Jab tak condition true hai, tab tak loop chalega. Jaise hi condition false hogi, loop ruk jayega.
+Jab ek loop ke andar doosra loop hota hai, toh aap label lagakar specify kar sakte hain ki kaunsa loop break karna hai:
 
-// fn main() {
-//     let mut count = 5;
-//     while count != 0 {
-//         println!("number:{count}");
-//         count -= 1;
-//     }
-//     println!("LIFTOFF!!!");
-// }
+```rust
+fn main() {
+    let mut count = 0;
 
-// C. for Loop (Sabse Safe aur Popular Loop)
-// Rust mein collections (array/vectors) par iterate karne ke liye ya specific range chalaney ke liye for loop sabse best, safe aur fast hota hai.
+    'counting_up: loop {
+        println!("count = {count}");
+        let mut remaining = 10;
+        loop {
+            println!("remaining = {remaining}");
+            if remaining == 9 {
+                break;
+            }
+            if count == 2 {
+                break 'counting_up;
+            }
+            remaining -= 1;
+        }
+        count += 1;
+    }
+}
+```
 
-// 1. Array Par Iterate Karna
-// fn main() {
-//     let a = [1, 2, 3, 4, 5];
-//     for elements in a {
-//         println!("values is:{elements}");
-//     }
-// }
+## B. while Loop (Conditional Loop)
 
-// 2. Number Range Par Iterate Karna (Range)
+Jab tak condition true hai, tab tak loop chalega. Jaise hi condition false hogi, loop ruk jayega:
 
-// Range ke liye 1..4 (1 se 3 tak) ya 1..=4 (1 se 4 tak) ka use hota hai. Reverse ginti ke liye .rev() method lagate hain:
+```rust
+fn main() {
+    let mut count = 5;
+    while count != 0 {
+        println!("number: {count}");
+        count -= 1;
+    }
+    println!("LIFTOFF!!!");
+}
+```
 
-// fn main() {
-//     for number in 1..4 {
-//         println!("number:{number}");
-//     }
-// }
+## C. for Loop (Sabse Safe aur Popular Loop)
+
+Collections (array/vectors) par iterate karne ke liye ya specific range chalaney ke liye `for` loop sabse best, safe aur fast hai.
+
+### 1. Array Par Iterate Karna
+
+```rust
+fn main() {
+    let a = [1, 2, 3, 4, 5];
+    for elements in a {
+        println!("values is: {elements}");
+    }
+}
+```
+
+### 2. Number Range Par Iterate Karna (Range)
+
+Range ke liye `1..4` (1 se 3 tak) ya `1..=4` (1 se 4 tak) ka use hota hai. Reverse ginti ke liye `.rev()` method lagate hain:
+
+```rust
+fn main() {
+    for number in 1..4 {
+        println!("number: {number}");
+    }
+}
+```
+*/
 
 fn main() {
     for number in (1..4).rev() {
-        println!("number:{number}");
+        println!("number: {number}");
     }
 }
