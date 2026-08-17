@@ -123,4 +123,118 @@ println!("{r3}");
 ```
 */
 
+
+
+// Line 1: let mut s = String::from("hello");
+
+//     Kya hua?
+
+//         s naam ka mutable variable Stack par bana.
+
+//         Heap memory par "hello" text allocate hua.
+
+// 🎨 Memory Diagram (Step 1):
+// Plaintext
+
+//        STACK MEMORY                         HEAP MEMORY
+//   +-----------------------+              +---+---+---+---+---+
+//   | Name  | Field | Value |              | Index | Value     |
+//   +-----------------------+              +---+---+---+---+---+
+//   | s     | ptr   |0x1000 | -----------> | 0     |  'h'      |
+//   | (mut) | len   | 5     |              | 1     |  'e'      |
+//   |       | cap   | 5     |              | 2     |  'l'      |
+//   +-----------------------+              | 3     |  'l'      |
+//                                          | 4     |  'o'      |
+//                                          +---+---+---+---+---+
+
+// Line 2 & 3: let r1 = &s; let r2 = &s;
+
+//     Kya hua?
+
+//         r1 aur r2 dono Immutable References (&s) bane.
+
+//         Yeh dono direct Heap ko point nahi karte, balki Stack par rakhe s ke address ko point karte hain.
+
+//         Rust ek saath unlimited immutable references allow karta hai (kyunki read-only operations se koi hazard nahi hota).
+
+// 🎨 Memory Diagram (Step 2):
+// Plaintext
+
+//        STACK MEMORY                         HEAP MEMORY
+//   +-----------------------+              +---+---+---+---+---+
+//   | Name  | Value         |              | Index | Value     |
+//   +-----------------------+              +---+---+---+---+---+
+//   | s     | ptr: 0x1000   | -----------> | 0     |  'h'      |
+//   |       | len: 5, cap: 5|              | 1     |  'e'      |
+//   +-----------------------+              | 2     |  'l'      |
+//   | r1    | points to `s` | ------\      | 3     |  'l'      |
+//   +-----------------------+        \     | 4     |  'o'      |
+//   | r2    | points to `s` | --------> [s variable] +---+---+---+
+//   +-----------------------+        /
+
+//     Active Borrows: r1 (Immutable), r2 (Immutable).
+
+// Line 4: println!("{r1} and {r2}");
+
+//     Kya hua?
+
+//         r1 aur r2 ki values read hui aur terminal par hello and hello print hua.
+
+//     💡 Sabse Main Point (Non-Lexical Lifetimes):
+
+//         Is line par r1 aur r2 ka aakhiri (last) use hua hai.
+
+//         Line 4 ke khatam hote hi Rust compiler samajh jata hai ki code mein aage r1 ya r2 ki zaroorat nahi hai.
+
+//         Isiliye r1 aur r2 ka borrowing scope Line 4 par hi KHATAM (expire) ho jata hai.
+
+// Plaintext
+
+//   [Line 4 execution finished] ---> `r1` aur `r2` ke references ab ACTIVE nahi hain!
+
+// Line 5: let r3 = &mut s;
+
+//     Kya hua?
+
+//         s ka ek Mutable Reference (&mut s) bana.
+
+//     Kyun Compile Error NAHI Aaya?
+
+//         Rust ka Rule: "Aap Immutable aur Mutable reference ek saath nahi rakh sakte."
+
+//         Lekin kyunki Line 4 ke baad r1 aur r2 ka scope khatam ho chuka tha, is waqt memory mein koi bhi doosra reference active nahi tha.
+
+//         Isiliye r3 ko exclusive write access (Mutable Borrow) asaani se mil gaya!
+
+// 🎨 Memory Diagram (Step 3):
+// Plaintext
+
+//        STACK MEMORY                         HEAP MEMORY
+//   +-----------------------+              +---+---+---+---+---+
+//   | Name  | Value         |              | Index | Value     |
+//   +-----------------------+              +---+---+---+---+---+
+//   | s     | ptr: 0x1000   | -----------> | 0     |  'h'      |
+//   +-----------------------+              | 1     |  'e'      |
+//   | r1    | [EXPIRED]     |              | 2     |  'l'      |
+//   | r2    | [EXPIRED]     |              | 3     |  'l'      |
+//   +-----------------------+              | 4     |  'o'      |
+//   | r3    | points to `s` | -----------> [s variable] +---+---+---+
+//   |(&mut) | (Exclusive!)  |
+//   +-----------------------+
+
+// Line 6: println!("{r3}");
+
+//     Kya hua?
+
+//         r3 reference ko read karke hello print kiya gaya.
+
+//         Output: hello
+
+// Summary: Purana Rust vs Naya Rust (NLL)
+
+//     Old Rust (2018 se pehle): Scope purely {} blocks par chalta tha. Line 6 tak r1 aur r2 active maane jaate, aur Line 5 par Compile Error aata.
+
+//     Modern Rust (NLL): Compiler dekhta hai ki variable aakhiri baar kahan use hua hai. Last use ke baad borrow release ho jata hai, isiliye Line 5 par Naya &mut reference allow ho gaya.
+
+
 fn main() {}
