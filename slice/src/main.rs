@@ -66,9 +66,9 @@ fn main() {
 
     // 2. Function se slice Lena
     let word = first_word(&s);
+    // s.clear(); 
     println!("First word: {word}");
     
-    s.clear(); // ❌ Agar ise uncomment karenge toh COMPILE ERROR aayega
 }
 
 // Return type `usize` se badal kar `&str` kar diya
