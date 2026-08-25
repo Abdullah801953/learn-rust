@@ -6,7 +6,7 @@
 // pub fn add_numbers(a: i32, b: i32) -> i32 {
 //     a + b
 // }
-// 2. Package Kya Hai? (Folder structure ke saath)Package ek aisa Container (Folder) hota hai jisme aapka Cargo.toml hota hai aur ek se zyada Crates (Binary + Library) ek saath pack hote hain.Real Package Folder StructureAap apne terminal par yeh command chalayein:Bashcargo new my_app
+// 2. Package Kya Hai? (Folder structure ke saath)Package ek aisa Container (Folder) hota hai jisme aapka Cargo.toml hota hai aur ek se zyada Crates (Binary + Library) ek saath pack hote hain.Real Package Folder StructureAap apne terminal par yeh command chalayein:Bash cargo new my_app
 // Cargo aapke liye ek Package create kar deta hai jiska structure aisa dikhta hai:Plaintextmy_app/                          <--- YEH POORA PACKAGE HAI
 // ├── Cargo.toml                   <--- Package ki Metadata file
 // └── src/
