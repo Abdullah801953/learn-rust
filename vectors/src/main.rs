@@ -65,3 +65,59 @@
 
 // Yeh sabse zaroori rule hai! Agar aapne Vector ke kisi element ka Immutable reference (&) liya hai, toh aap usi scope mein Vector ko Modify (push/pop) nahi kar sakte.
 
+// fn main() {
+//     let mut v = vec![1, 2, 3, 4, 5];
+
+//     let first = &v[0]; // 🛑 Immutable borrow: first element ka reference liya
+
+//     v.push(6); // 🛑 Mutable borrow: Memory me naya element push kiya
+
+//     // Error! First point kar raha tha purani memory ko, lekin push karne se
+//     // vector new memory location par move ho gaya ho sakta hai.
+//     // println!("First element is: {first}");
+// }
+
+// Aisa kyu hota hai?
+
+// Heap memory par jab Vector full ho jata hai, toh Rust poore Vector ko utha kar memory ki nayi location par shift kar deta hai. Agar Rust aapko purana reference read karne deta, toh wo ek invalid memory space ko point kar raha hota (Dangling Pointer Problem)!
+
+// 5. Vector Par Loop Chalana (Iteration)
+// A. Read-only Loop (Immutable):
+
+// fn main() {
+//     let v = vec![100, 32, 57];
+
+//     for items in &v {
+//         println!("value: {}", items);
+//     }
+// }
+
+// B. Modify Elements in Loop (Mutable + Dereferencing *):
+// Vector ke har element ko badalne ke liye &mut loop aur * (Dereference Operator) ka use hota hai.
+
+// fn main() {
+//     let mut v = vec![100, 32, 57];
+
+//     for item in &mut v {
+//         // '*' se hum memory location ke andar ki value ko modify karte hain
+//         *item += 50;
+//     }
+
+//     println!("Modified Vector: {:?}", v); // [150, 82, 107]
+// }
+
+// 6. Multiple Types Store Karna (Enum Trick)
+
+// Vector by default sirf ek hi type hold kar sakta hai. Lekin agar hume alag-alag types (e.g., Integer, Float, Text) ek hi Vector me rakhne hon, toh hum Enum ka use karte hain:
+
+// 7. Memory Cleanup (Dropping Vector)
+
+// Jab Vector scope se bahar chala jata hai, toh Rust automatically use aur uske andar ke saare elements ko Heap memory se clean (drop) kar deta hai.
+
+// fn main() {
+//     {
+//         let v = vec![1, 2, 3, 4];
+//         // v ke sath kaam karein
+//     } // <-- Yahan scope khatam hua! 'v' aur uske saare elements memory se delete ho gaye.
+// }
+
