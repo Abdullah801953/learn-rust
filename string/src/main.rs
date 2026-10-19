@@ -66,7 +66,7 @@
 
 //    Compiling string v0.1.0 (C:\Users\dell\projects\hello_world\string)
 
-// error[E0308]: mismatched types                                                                   
+// error[E0308]: mismatched types
 
 //   --> src\main.rs:61:19
 
@@ -86,12 +86,11 @@
 
 //    |                   +
 
+// For more information about this error, try `rustc --explain E0308`.
 
-// For more information about this error, try `rustc --explain E0308`.                              
+// error: could not compile `string` (bin "string") due to 1 previous error
 
-// error: could not compile `string` (bin "string") due to 1 previous error                         
-
-// PS C:\Users\dell\projects\hello_world\string> 
+// PS C:\Users\dell\projects\hello_world\string>
 
 // Yeh error Rust mein + operator ke signature (rules) ki vajah se aa raha hai.
 
@@ -111,8 +110,131 @@
 //     let s2 = String::from("world");
 
 //     // s2 ke aage `&` lagaya
-//     let s3 = s1 + &s2; 
+//     let s3 = s1 + &s2;
 
 //     println!("{}", s3); // Output: helloworld
+
 // }
 
+// C. Multiple Strings ke liye format! Macro
+
+// Jab bohot saari strings jodni ho, toh + likhna mushkil ho jata hai. Iske liye format! use karein—yeh kisi ka bhi ownership nahi leta!
+
+// fn main(){
+//     let s1 = String::from("tic");
+//     let s2 = String::from("tac");
+//     let s3 = String::from("toe");
+
+// let s=format!("{s1}-{s2}-{s3}");
+//     println!("{s}");
+// }
+
+// 1. Rust Strings me Indexing (s[0]) Kyun Disallowed Hai?Dusri programming languages (jaise Python, JavaScript, ya C) me aap s[0] karke string ka pehla letter nikal lete hain. Lekin Rust me agar aap aisa likhte hain:Rustlet s1 = String::from("hi");
+// let h = s1[0]; // ❌ Compiler Error!
+// To compiler E0277 error deta hai. Rust aisa do mukhya kaarno se karta hai: Internal Memory Representation aur Performance Guarantee ($O(1)$).
+
+// 2. Internal Representation (Memory me String Kaise Store Hota Hai?)
+
+// Rust me String actually ek Vec<u8> (vector of bytes) ke upar ek wrapper hota hai jo UTF-8 encoding follow karta hai.
+
+//     ASCII / English characters: Har character 1 byte leta hai.
+//     Rust
+
+//     let hello = String::from("Hola");
+//     // Length = 4 bytes (H, o, l, a sab 1-1 byte ke hain)
+
+//     Non-ASCII characters (Cyrillic, Hindi, Emojis, etc.): Har character 2 se 4 bytes tak le sakta hai.
+//     Rust
+
+//     let hello = String::from("Здравствуйте");
+// Length = 24 bytes (Ye 12 letters ka shabd hai, lekin har character 2 bytes leta hai)
+
+// Agar s[0] allowed hota, toh kya hota?
+
+// Agar aap "Здравствуйте" ke index 0 ko access karte:
+
+//     Character 'З' UTF-8 me do bytes se milkar banta hai: [208, 151].
+
+//     Index 0 par byte value 208 hai.
+
+//     Byte value 208 apne aap me koi valid character nahi hai.
+
+//     Agar Rust aapko 208 return karta, toh wo galat aur unexpected hota. Isiliye Rust compile time par hi s[0] ko block kar deta hai taaki runtime par unexpected bugs na aayein.
+
+// 3. Performance Reason: $O(1)$ vs $O(N)$ Time ComplexityComputer science me array[index] ya vector[index] access $O(1)$ (constant time) hona chahiye.UTF-8 me kyunki har character ki length (bytes me) alag ho sakti hai, Rust ko $N$-th character tak pahunchne ke liye string ke start se saare bytes count karne padenge. Ye operation $O(N)$ (linear time) ho jayega.Rust aapko ye illusion nahi dena chahta ki indexing fast hai, isiliye direct [] indexing allow nahi karta.
+
+// 5. Slicing Strings (&s[range])
+
+// Agar aapko byte index ke zariye string slice banana hai, toh aap Range syntax [start..end] use kar sakte hain:
+// 5. Slicing Strings (&s[range])
+
+// Agar aapko byte index ke zariye string slice banana hai, toh aap Range syntax [start..end] use kar sakte hain:
+// Rust
+
+// let hello = "Здравствуйте";
+// let s = &hello[0..4]; // Pehle 4 bytes -> "Зд" (Kyunki har char 2 bytes ka hai)
+
+// ⚠️ Common Pitfall (Runtime Panic):
+// Agar aap range ko kisi character ke beech me todte hain (jaise &hello[0..1]), toh Rust program runtime panic (crash) kar jayega:
+// Code ki Step-by-Step Working
+
+// Aayein dekhte hain ki background me memory ke andar kya ho raha hai:
+// Line 1: let hello = "Здравствуйте";
+
+//     String "Здравствуйте" memory me UTF-8 format me store hoti hai.
+
+//     Russian language ka har letter UTF-8 me 2 bytes leta hai:
+
+//         Letter 'З' = Byte 0 aur Byte 1 ([208, 151])
+
+//         Letter 'д' = Byte 2 aur Byte 3 ([208, 180])
+
+//     Isliye, pehle do letters (Зд) milakar kul 4 bytes bante hain.
+
+// Line 2: let s = &hello[0..4];
+
+//     [0..4] ka matlab hai Byte Index 0 se lekar Byte Index 3 tak (4th byte included nahi hai).
+
+//     Rust memory me check karta hai:
+
+//         Byte 0..2 = 'З' (Valid character boundary)
+
+//         Byte 2..4 = 'д' (Valid character boundary)
+
+//     Kyunki 0 aur 4 dono sahi character boundaries par hain, Rust s ko ek string slice (&str) bana deta hai jiski value "Зд" hoti hai.
+
+// Ek Chota Sa Experiment (Crash Test)
+
+// Agar aap [0..4] ki jagah [0..1] likhenge:
+// Rust
+
+// fn main() {
+//     let hello = "Здравствуйте";
+//     let s = &hello[0..1]; // ❌ Crash ho jayega!
+//     println!("{s}");
+// }
+
+// Toh Rust runtime par panic (crash) kar jayega, kyunki Index 1 par pehla letter 'З' aadha hi kat-ta hai (character boundary toot jati hai).
+
+// 6. Iterating Over Strings (Sahi Tarika)
+
+// String ke parts par kaam karne ke liye aapko explicit hona padta hai ki aapko characters chahiye ya bytes:
+// Iterating over Characters (.chars())
+
+// char (Unicode scalar values) par loop chalane ke liye:
+
+// fn main() {
+//     for c in "Зд".chars() {
+//         println!("{c}");
+//     }
+// }
+
+// Iterating over Bytes (.bytes())
+
+// Raw byte values par loop chalane ke liye:
+
+fn main(){
+    for c in "Зд".bytes(){
+        println!("{c}");
+    }
+}
